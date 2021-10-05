@@ -1,4 +1,8 @@
 version: '3'
+
+networks:
+  production-network:
+
 services:
 
   zookeeper:
@@ -21,3 +25,20 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+  postgres_proposta:
+    image: 'postgres:9.6-alpine'
+    volumes:
+      - aplicacao-volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: dojao
+      POSTGRES_PASSWORD: dojao
+      POSTGRES_DB: dojao
+      POSTGRES_HOST: dojao
+    networks:
+      - production-network
+
+volumes:
+  aplicacao-volume:
