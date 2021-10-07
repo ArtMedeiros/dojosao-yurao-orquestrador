@@ -1,8 +1,5 @@
 version: '3'
 
-networks:
-  production-network:
-
 services:
 
   zookeeper:
@@ -26,10 +23,39 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
-  postgres_proposta:
+  extrato:
+    image: "kleyssonsilva/extrato-dojo"
+    ports:
+      - 8083:8080
+    depends_on:
+      - postgres-extrato
+    environment:
+      DATASOURCE_HOST: jdbc:postgresql://postgres-extrato:5432/dojao
+      KAFKA_BOOTSTRAP_SERVER: kafka:29092
+
+  conta-digital:
+    image: "kleyssonsilva/conta-digital-dojo"
+    ports:
+      - 8081:8080
+    depends_on:
+      - postgres-conta-digital
+    environment:
+      DATASOURCE_URL: jdbc:postgresql://postgres-conta-digital:5432/dojao
+
+  email:
+    image: "kleyssonsilva/email-dojo"
+    ports:
+      - 8082:8080
+    depends_on:
+      - postgres-email
+    environment:
+      DB_URL: jdbc:postgresql://postgres-email:5432/dojao
+      KAFKA_SERVER: kafka:29092
+
+  postgres-orquestrador:
     image: 'postgres:9.6-alpine'
     volumes:
-      - aplicacao-volume:/var/lib/postgresql/data
+      - orquestrador-volume:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment:
@@ -37,8 +63,45 @@ services:
       POSTGRES_PASSWORD: dojao
       POSTGRES_DB: dojao
       POSTGRES_HOST: dojao
-    networks:
-      - production-network
+
+  postgres-conta-digital:
+    image: 'postgres:9.6-alpine'
+    volumes:
+      - conta-digital-volume:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: dojao
+      POSTGRES_PASSWORD: dojao
+      POSTGRES_DB: dojao
+      POSTGRES_HOST: dojao
+
+  postgres-email:
+    image: 'postgres:9.6-alpine'
+    volumes:
+      - email-volume:/var/lib/postgresql/data
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: dojao
+      POSTGRES_PASSWORD: dojao
+      POSTGRES_DB: dojao
+      POSTGRES_HOST: dojao
+
+  postgres-extrato:
+    image: 'postgres:9.6-alpine'
+    volumes:
+      - extrato-volume:/var/lib/postgresql/data
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_USER: dojao
+      POSTGRES_PASSWORD: dojao
+      POSTGRES_DB: dojao
+      POSTGRES_HOST: dojao
 
 volumes:
-  aplicacao-volume:
+  orquestrador-volume:
+  extrato-volume:
+  email-volume:
+  conta-digital-volume:
