@@ -52,6 +52,15 @@ services:
       DB_URL: jdbc:postgresql://postgres-email:5432/dojao
       KAFKA_SERVER: kafka:29092
 
+  recarga-celular:
+    image: "kleyssonsilva/recarga-celular-dojo"
+    ports:
+      - 8084:8080
+    depends_on:
+      - postgres-recarga-celular
+    environment:
+      DATASOURCE_HOST: jdbc:postgresql://postgres-recarga-celular:5432/dojao
+
   postgres-orquestrador:
     image: 'postgres:9.6-alpine'
     volumes:
@@ -100,8 +109,21 @@ services:
       POSTGRES_DB: dojao
       POSTGRES_HOST: dojao
 
+  postgres-recarga-celular:
+    image: 'postgres:9.6-alpine'
+    volumes:
+      - recarga-celular-volume:/var/lib/postgresql/data
+    ports:
+      - 5436:5432
+    environment:
+      POSTGRES_USER: dojao
+      POSTGRES_PASSWORD: dojao
+      POSTGRES_DB: dojao
+      POSTGRES_HOST: dojao
+
 volumes:
   orquestrador-volume:
   extrato-volume:
   email-volume:
   conta-digital-volume:
+  recarga-celular-volume:
