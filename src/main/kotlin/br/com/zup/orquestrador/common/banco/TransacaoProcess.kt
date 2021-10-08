@@ -9,7 +9,6 @@ class TransacaoProcess(
     val repository: TransacaoRepository
 ): AfterProcess {
 
-    @Transactional
     override fun processa(transacao: Transacao) {
         repository.save(transacao)
     }

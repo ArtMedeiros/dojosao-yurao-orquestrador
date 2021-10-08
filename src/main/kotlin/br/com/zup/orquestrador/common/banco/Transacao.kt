@@ -19,4 +19,11 @@ class Transacao(
     @Id
     @GeneratedValue(strategy = IDENTITY)
     var id:Long? = null
+
+    var status:TransacaoStatus = TransacaoStatus.CRIADA
+        private set
+
+    fun finalizarTransacao() {
+        this.status = TransacaoStatus.FINALIZADA
+    }
 }
